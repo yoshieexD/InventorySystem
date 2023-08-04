@@ -42,3 +42,28 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+# Flutter/Dart specific
+**/build/
+**/ios/Pods/
+**/ios/Podfile.lock
+**/android/build/
+**/android/gradle/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/GeneratedPluginRegistrant.java
+
+
+
+# Dart Analysis
+**/.dart_tool/
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/flutter_assets/
+**/.flutter-plugins
+**/.metadata
+**/.flutter-plugins-dependencies
+
