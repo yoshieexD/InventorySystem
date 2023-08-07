@@ -8,12 +8,10 @@ app = Flask(__name__)
 CORS(app)
 
 
-load_dotenv()
-
-url = os.getenv("URL")
-db = os.getenv("DB")
-username = os.getenv("USERNAME")
-password = os.getenv("PASSWORD")
+url = "http://localhost:8069"
+db = "admin"
+username = "admin@admin.com"
+password = "admin"
 
 
 def get_odoo_server():
@@ -39,7 +37,7 @@ def list_partners():
     if server and uid:
         partner_ids = server.execute_kw(
             db,
-            uid,  # Convert uid to an integer
+            uid,
             password,
             "res.partner",
             "search",
@@ -51,7 +49,7 @@ def list_partners():
         else:
             partner_data = server.execute_kw(
                 db,
-                uid,  # Convert uid to an integer
+                uid,
                 password,
                 "res.partner",
                 "read",
