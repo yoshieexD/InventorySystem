@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<String> fetchInventoryOverview() async {
   final response =
-      await http.get(Uri.parse('http://127.0.0.1:5000/inventory_overview'));
+      await http.get(Uri.parse('${dotenv.env['API_URL']}/inventory_overview'));
   if (response.statusCode == 200) {
     return response.body;
   } else {
