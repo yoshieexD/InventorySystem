@@ -1,48 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
 
-  void _login(BuildContext context) {
-    String username = _usernameController.text;
-    String password = _passwordController.text;
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
-    if (username == "username" && password == "password") {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid username or password')),
-      );
-    }
+  Future<void> loginUser() async {
+    final response = await http.post(
+      Uri.parse('${dotenv.env['API_URL']}/login2'),
+      headers: {'Content-Type': 'application/json'},
+      body:
+          '{"username": "${usernameController.text}", "password": "${passwordController.text}"}',
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      print('Nice one');
+    } else {}
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login Page'),
+        title: const Text('Login'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: _usernameController,
+            TextFormField(
+              controller: usernameController,
               decoration: const InputDecoration(labelText: 'Username'),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
+            TextFormField(
+              controller: passwordController,
               decoration: const InputDecoration(labelText: 'Password'),
+              obscureText: true,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => _login(context),
+              onPressed: loginUser,
               child: const Text('Login'),
             ),
           ],

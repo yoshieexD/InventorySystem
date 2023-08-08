@@ -13,7 +13,6 @@ Future<String> fetchInventoryOverview() async {
 }
 
 class InventoryOverviewScreen extends StatefulWidget {
-  // Add a named constructor with the key parameter
   const InventoryOverviewScreen({Key? key}) : super(key: key);
 
   @override
@@ -23,6 +22,8 @@ class InventoryOverviewScreen extends StatefulWidget {
 
 class _InventoryOverviewScreenState extends State<InventoryOverviewScreen> {
   String _inventoryOverviewData = '';
+  bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -35,10 +36,14 @@ class _InventoryOverviewScreenState extends State<InventoryOverviewScreen> {
       String data = await fetchInventoryOverview();
       setState(() {
         _inventoryOverviewData = data;
+        _isLoading = false;
+        _hasError = false;
       });
     } catch (e) {
       setState(() {
         _inventoryOverviewData = 'Error: $e';
+        _isLoading = false;
+        _hasError = true;
       });
     }
   }
@@ -49,11 +54,34 @@ class _InventoryOverviewScreenState extends State<InventoryOverviewScreen> {
       appBar: AppBar(
         title: const Text('Inventory Overview'),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(_inventoryOverviewData),
-        ),
+      body: _isLoading
+          ? _buildLoadingIndicator()
+          : _hasError
+              ? _buildErrorWidget()
+              : _buildInventoryOverview(),
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    return const Center(
+      child: Text(
+        'Error: Failed to load inventory overview',
+        style: TextStyle(color: Colors.red),
+      ),
+    );
+  }
+
+  Widget _buildInventoryOverview() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(_inventoryOverviewData),
       ),
     );
   }
