@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:convert';
+import 'package:client/utils/api_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:client/routes/routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,17 +15,13 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
 
   Future<void> loginUser() async {
-    final response = await http.post(
-      Uri.parse('${dotenv.env['API_URL']}/login2'),
-      headers: {'Content-Type': 'application/json'},
-      body:
-          '{"username": "${usernameController.text}", "password": "${passwordController.text}"}',
+    final success = await ApiService.loginUser(
+      usernameController.text,
+      passwordController.text,
     );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      print('Nice one');
-    } else {}
+    if (success) {
+      AppRouter.instance.go(AppRoutes.tabs);
+    }
   }
 
   @override
@@ -48,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: loginUser,
+              onPressed: () => loginUser(),
               child: const Text('Login'),
             ),
           ],

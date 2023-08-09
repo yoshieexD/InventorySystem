@@ -106,7 +106,7 @@ def inventory_overview():
         )
 
         if not picking_type_ids:
-            return "No picking types found."
+            return jsonify([])  # Return an empty JSON array
         else:
             picking_type_data = server.execute_kw(
                 os.environ.get("ODOO_DB"),
@@ -118,18 +118,11 @@ def inventory_overview():
                 {"fields": ["name", "code", "sequence"]},
             )
             if picking_type_data:
-                picking_type_info = ""
-                for picking_type in picking_type_data:
-                    picking_type_info += f"ID: {picking_type['id']}<br>"
-                    picking_type_info += f"Name: {picking_type['name']}<br>"
-                    picking_type_info += f"Code: {picking_type['code']}<br>"
-                    picking_type_info += f"Sequence: {picking_type['sequence']}<br>"
-                    picking_type_info += "-------<br>"
-                return picking_type_info
+                return jsonify(picking_type_data)  # Return the JSON data directly
             else:
-                return "Failed to retrieve picking type data."
+                return jsonify([])  # Return an empty JSON array
     else:
-        return "Could not connect to Odoo server."
+        return jsonify({"error": "Could not connect to Odoo server."})
 
 
 @app.route("/stock_picking_data")
@@ -168,19 +161,18 @@ def receipts_data():
             os.environ.get("ODOO_PASSWORD"),
             "stock.picking",
             "search_read",
-            [],
+            ["picking_type_id" == 1],
             {"fields": ["name", "picking_type_id"], "context": {}},
         )
 
         if picking_data:
             picking_info = ""
             for picking in picking_data:
-                picking_info += f"Name: {picking['name']}<br>"
                 if "picking_type_id" in picking:
                     picking_type_id = picking["picking_type_id"][0]
                     if picking_type_id == 1:
+                        picking_info += f"Name: {picking['name']}<br>"
                         picking_info += f"Picking Type ID: {picking_type_id}<br>"
-                picking_info += "-------<br>"
             return picking_info
         else:
             return "No stock pickings found."

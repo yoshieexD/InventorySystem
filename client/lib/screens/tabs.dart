@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
 
 Future<String> fetchInventoryOverview() async {
   final response =
@@ -16,11 +17,10 @@ class InventoryOverviewScreen extends StatefulWidget {
   const InventoryOverviewScreen({Key? key}) : super(key: key);
 
   @override
-  _InventoryOverviewScreenState createState() =>
-      _InventoryOverviewScreenState();
+  InventoryOverviewScreenState createState() => InventoryOverviewScreenState();
 }
 
-class _InventoryOverviewScreenState extends State<InventoryOverviewScreen> {
+class InventoryOverviewScreenState extends State<InventoryOverviewScreen> {
   String _inventoryOverviewData = '';
   bool _isLoading = true;
   bool _hasError = false;
@@ -78,11 +78,32 @@ class _InventoryOverviewScreenState extends State<InventoryOverviewScreen> {
   }
 
   Widget _buildInventoryOverview() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(_inventoryOverviewData),
-      ),
+    final List<dynamic> inventoryData = json.decode(_inventoryOverviewData);
+
+    return ListView.builder(
+      itemCount: inventoryData.length,
+      itemBuilder: (context, index) {
+        final item = inventoryData[index];
+        return Card(
+          elevation: 3,
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: ListTile(
+            title: Text(
+              item['name'],
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                Text("Code: ${item['code']}"),
+                const SizedBox(height: 4),
+                Text("Sequence: ${item['sequence']}"),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
